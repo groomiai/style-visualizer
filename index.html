@@ -35,7 +35,6 @@
     <div class="small">Use the download button to save the result. To save to your app, upload the image to Glide profile.</div>
   </div>
 
-  <!-- MediaPipe face mesh -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
@@ -45,7 +44,8 @@
   // ===========================
   const overlays = {
   // Hairstyles
-  hair_short: 'https://ibb.co/kL1pbC1.png,
+  // FIX 1: Added missing closing single quote '
+  hair_short: 'https://ibb.co/kL1pbC1.png',
   hair_long: 'https://ibb.co/HLQd3Whr.png',
   hair_curly: 'https://ibb.co/7tC7yDYJ.png',
   hair_buzz: 'https://ibb.co/V0vknwhD.png',
@@ -55,7 +55,8 @@
   beard_trim: 'https://ibb.co/LzzGv0x2.png',
   beard_full: 'https://ibb.co/MkJZfnGG.png',
   beard_goatee: 'https://ibb.co/pBxFFNT1.png',
-  beard_clean: 'https://ibb.co/Kxd6CwKJ,
+  // FIX 1: Added missing closing single quote '
+  beard_clean: 'https://ibb.co/Kxd6CwKJ',
   // Outfits
   outfit_blazer: 'https://ibb.co/NdsPwqGj.png',
   outfit_tshirt: 'https://ibb.co/G3RY3jdD.png',
@@ -174,25 +175,15 @@
     const recipeIndex = parseInt(document.getElementById('recipe').value || '0');
 
     // Simple recipe mapping: you can expand these later
+    // FIX 2: Corrected the definition of 'recipes' to be an array of objects
+    // that use the keys from the 'overlays' variable.
     const recipes = [
-  hair_short: 'https://ibb.co/kL1pbC1.png,
-  hair_long: 'https://ibb.co/HLQd3Whr.png',
-  hair_curly: 'https://ibb.co/7tC7yDYJ.png',
-  hair_buzz: 'https://ibb.co/V0vknwhD.png',
-  hair_ponytail: 'https://ibb.co/hRrv87mn.png',
-  hair_fade: 'https://ibb.co/TDgD6yc7.png',
-  // Beards
-  beard_trim: 'https://ibb.co/LzzGv0x2.png',
-  beard_full: 'https://ibb.co/MkJZfnGG.png',
-  beard_goatee: 'https://ibb.co/pBxFFNT1.png',
-  beard_clean: 'https://ibb.co/Kxd6CwKJ,
-  // Outfits
-  outfit_blazer: 'https://ibb.co/NdsPwqGj.png',
-  outfit_tshirt: 'https://ibb.co/G3RY3jdD.png',
-  outfit_hoodie: 'https://ibb.co/WWc9xJN5.png',
-  outfit_formal: 'https://ibb.co/C59GKdbT.png',
-  outfit_party: 'https://ibb.co/FqzcpHGb.png',
-  outfit_ethnic: 'https://ibb.co/7JdVZFdq.png
+      // Index 0: Recipe 1 — Classic (clean)
+      { hair: 'hair_short', beard: 'beard_clean', outfit: 'outfit_formal' },
+      // Index 1: Recipe 2 — Textured + stubble
+      { hair: 'hair_curly', beard: 'beard_trim', outfit: 'outfit_tshirt' },
+      // Index 2: Recipe 3 — Formal + neat
+      { hair: 'hair_fade', beard: 'beard_trim', outfit: 'outfit_blazer' }
     ];
     const chosen = recipes[recipeIndex];
 
