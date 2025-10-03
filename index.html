@@ -40,8 +40,7 @@
 
   <script>
   // ===========================
-  // FIXED: All links are now converted to the correct RAW GitHub format (raw.githubusercontent.com)
-  // The commit SHA 'df581236ba40f6998beefa7c247ff3b91fda9276' is used for link stability.
+  // FIXED: All links are now converted to the correct RAW GitHub format.
   // ===========================
   const overlays = {
   // Hairstyles
@@ -144,6 +143,50 @@
     return {x, y};
   }
 
+  // ==========================================================
+  // FIXED: New drawOverlay function to remove solid white background
+  // ==========================================================
+  function drawOverlay(imgObj, centerX, centerY, scaleFactor, vertOffsetFactor) {
+    const imgW = (headWidth * scaleFactor);
+    const imgH = imgW * (imgObj.height / imgObj.width || 1.0);
+
+    // Create a temporary canvas to process the overlay image
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = imgObj.width;
+    tempCanvas.height = imgObj.height;
+
+    // Draw the original overlay image onto the temporary canvas
+    tempCtx.drawImage(imgObj, 0, 0);
+
+    // Get the image data
+    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+    const pixels = imageData.data; // Array of [R, G, B, A, R, G, B, A, ...]
+
+    // Iterate through pixels and make white pixels transparent
+    // Threshold set to 245 for R, G, B values (close to pure white 255)
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+      
+      if (r > 245 && g > 245 && b > 245) {
+        pixels[i + 3] = 0; // Set Alpha to 0 (fully transparent)
+      }
+    }
+
+    // Put the modified image data back to the temporary canvas
+    tempCtx.putImageData(imageData, 0, 0);
+
+    // Now draw from the temporary canvas to the main canvas with rotation and scale
+    ctx.save();
+    ctx.translate(centerX, centerY + (vertOffsetFactor || 0));
+    ctx.rotate(angle);
+    ctx.drawImage(tempCanvas, -imgW / 2, -imgH / 2, imgW, imgH);
+    ctx.restore();
+  }
+  // ==========================================================
+
   function drawComposites(){
     drawBase();
     if (!currentLandmarks) return;
@@ -159,21 +202,10 @@
     // Angle
     const angle = Math.atan2(rightEye.y-leftEye.y, rightEye.x-leftEye.x);
 
-    // Helper to draw an overlay with rotation and scale
-    function drawOverlay(imgObj, centerX, centerY, scaleFactor, vertOffsetFactor){
-      const imgW = (headWidth * scaleFactor);
-      const imgH = imgW * (imgObj.height / imgObj.width || 1.0);
-      ctx.save();
-      ctx.translate(centerX, centerY + (vertOffsetFactor || 0));
-      ctx.rotate(angle);
-      ctx.drawImage(imgObj, -imgW/2, -imgH/2, imgW, imgH);
-      ctx.restore();
-    }
-
     // Recipe selection: pick overlays for the selected recipe index
     const recipeIndex = parseInt(document.getElementById('recipe').value || '0');
 
-    // FIXED: Corrected the definition of 'recipes' to be an array of objects
+    // FIXED: Corrected the definition of 'recipes'
     const recipes = [
       // Index 0: Recipe 1 — Classic (clean)
       { hair: 'hair_short', beard: 'beard_clean', outfit: 'outfit_formal' },
